@@ -2,7 +2,30 @@ import cv2 as cv
 import numpy as np
 import os
 
-
+'''
+def reduceValHSV(val, factor):
+    return factor * (val // factor)
+def ColorsHSV(img, factor):
+    cv.imshow('img1',img[0])
+    cv.imshow('img2',img[1])
+    size1 = img[0].shape
+    size2 = img[1].shape
+    lis_rgb_img=[]
+    for x in range(2):
+        hsv_img = cv.cvtColor(img[x], cv.COLOR_BGR2HSV)
+        h, s, v = cv.split(hsv_img)
+        if x==0:
+            s=size1
+        elif x==1:
+            s=size2
+        for i in range(s[0]):
+            for j in range(s[1]):
+                h[i, j] = reduceValHSV(h[i, j], factor)
+        hsv_img = cv.merge([h, s, v])
+        rgb_img = cv.cvtColor(hsv_img, cv.COLOR_HSV2BGR)
+        lis_rgb_img.append(rgb_img)
+    edge_img(lis_rgb_img,size1,size2)
+'''
 def reduceValHSV(val, factor):
     return factor * (val // factor)
 def ColorsHSV(img, factor):

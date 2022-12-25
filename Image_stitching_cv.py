@@ -1,37 +1,22 @@
 import cv2 as cv
 import numpy as np
 import os
-'''
-def reduceValHSV(val, factor):
-    return factor * (val // factor)
-def ColorsHSV(img, factor):
-    cv.imshow('img1',img[0])
-    cv.imshow('img2',img[1])
-    size1 = img[0].shape
-    size2 = img[1].shape
-    lis_rgb_img=[]
-    for x in range(2):
-        hsv_img = cv.cvtColor(img[x], cv.COLOR_BGR2HSV)
-        h, s, v = cv.split(hsv_img)
-        if x==0:
-            s=size1
-        elif x==1:
-            s=size2
-        for i in range(s[0]):
-            for j in range(s[1]):
-                h[i, j] = reduceValHSV(h[i, j], factor)
-        hsv_img = cv.merge([h, s, v])
-        rgb_img = cv.cvtColor(hsv_img, cv.COLOR_HSV2BGR)
-        lis_rgb_img.append(rgb_img)
-    edge_img(lis_rgb_img,size1,size2)
-'''
+
 def similarites(vec1,vec2):
     #Root Mean Square Error
     sim_sub=np.subtract(vec1, vec2)
     sim_rms = np.sqrt(np.mean(np.power(sim_sub, 2)))
     return sim_rms
-
-
+def panorama(img,index):
+    if index == 0:
+        pan_img = cv.hconcat([img[1], img[0]])
+    elif index == 1:
+        pan_img = cv.hconcat([img[0], img[1]])
+    elif index == 2:
+        pan_img = cv.vconcat([img[1], img[0]])
+    elif index == 3:
+        pan_img = cv.vconcat([img[0], img[1]])
+    cv.imshow('Panorama', pan_img)
 def edge_img(img):
     cv.imshow('img1', img[0])
     cv.imshow('img2', img[1])
@@ -42,13 +27,13 @@ def edge_img(img):
     (w1, h1, c1) = img[0].shape
     #size2
     (w2, h2, c2) = img[1].shape
-    #print(str(w1)+','+str(w2))
-    #print(str(h1)+','+str(h2))
+    print(str(w1)+','+str(w2))
+    print(str(h1)+','+str(h2))
     sim_list=[]
     if w1 == w2:
         #Lift & Right edge of img1
         L1 = img1_array[0, :]
-        R1 = img1_array[height1 - 1, :]
+        R1 = img1_array[h1 - 1, :]
         # Lift & Right side of img2
         L2 = img2_array[0, :]
         R2 = img2_array[h2 - 1:, :]
@@ -57,12 +42,12 @@ def edge_img(img):
             if y ==0:
                 sim = similarites(L1, R2)
             elif y== 1:
-                sim2 = similarites(R1, L2)
+                sim = similarites(R1, L2)
             sim_list.append(sim)
 
     else:
-        rms_lis.append(1000000)
-        rms_lis.append(1000000)
+        sim_list.append(256**3)
+        sim_list.append(256**3)
 
     if h1 == h2:
         # Top & Bottom edge of img1
@@ -80,11 +65,16 @@ def edge_img(img):
                 sim = similarites(B1, T2)
             sim_list.append(sim)
 
-    else:
-        rms_lis.append(1000000)
-        rms_lis.append(1000000)
+    elif(h1!= h2) and (w1 == w2):
+        sim_list.append(256**3)
+        sim_list.append(256**3)
 
-    min_rms_pos = rms_lis.index(min(rms_lis))
+    if (h1!= h2) and (w1 != w2):
+        print('stiching is not ok' )
+
+    similar_edges=min(sim_list)
+    similar_index = sim_list.index(similar_edges)
+    panorama(img, similar_index)
 
 
 def folders(num):
@@ -113,7 +103,7 @@ while(True):
     folders(num)
 
     user_input = input('Do you want to choose another image (y/n): ')
-    if user_input.lower() == 'yes':
+    if user_input.lower() == 'y':
         continue
-    elif user_input.lower() == 'no':
+    elif user_input.lower() == 'n':
         break
