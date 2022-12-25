@@ -1,6 +1,8 @@
 import cv2 as cv
 import numpy as np
 import os
+
+
 def reduceValHSV(val, factor):
     return factor * (val // factor)
 def ColorsHSV(img, factor):
@@ -14,8 +16,8 @@ def ColorsHSV(img, factor):
     list_T = []*size[0]
     list_B = []*size[0]
     #loop1
+    i = 0
     for x in range(2):
-        i =0
         for j in range(size[1]):
             h[i, j] = reduceValHSV(h[i, j], factor)
             if i == 0:
@@ -26,8 +28,8 @@ def ColorsHSV(img, factor):
         i=size[0]-1
 
     # loop2
+    j = 0
     for x in range(2):
-       j = 0
        for i in range(size[0]):
            h[i, j] = reduceValHSV(h[i, j], factor)
            if j == 0:
@@ -36,11 +38,12 @@ def ColorsHSV(img, factor):
               list_B.append([h[i, j], s[i, j], v[i, j]])
        j = size[1]-1
 
-    print(list_L[1])
-    print(list_R[1])
-    print(list_T[1])
-    print(list_B[1])
-    return [list_L,list_R, list_T,list_B]
+    #print(list_L)
+    print(list_R)
+    #print(list_T)
+    #print(list_B)
+    edge=np.array([[list_L,list_R, list_T,list_B]])
+    return edge
 '''
    hsv_img = cv.merge([h, s, v])
    rgb_img = cv.cvtColor(hsv_img, cv.COLOR_HSV2BGR)
@@ -54,19 +57,21 @@ for folder in myFolders:
     path=imgFolder+'/'+folder
     #print(path)
     lis_img=[]
+    edge_img=np.ones((4,600,3))
     mylist=os.listdir(path)
     print(mylist)
     print(f'number of images: {len(mylist)}')
-    i=0
+    r=0
 
     for imgN in mylist:
         current_img=cv.imread(f'{path}/{imgN}')
         #current_img= cv.resize(current_img,(0,0),None,0.2,0.2)
         lis_img.append(current_img)
-        cv.imshow(folder, lis_img[i])
+        cv.imshow(folder, lis_img[r])
         cv.waitKey(5)
-        edge_img = ColorsHSV( lis_img[i], 3)
-        i = i + 1
+        edge_img[r] =ColorsHSV( lis_img[r], 3)
+        print(edge_img[r] .shape)
+        r = r + 1
         # cv.imshow('reduced colors', reduced_color_img)
 
     while (True):
